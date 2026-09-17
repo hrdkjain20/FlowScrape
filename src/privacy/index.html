@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FlowScrape Privacy</title><link rel="stylesheet" href="./privacy.css"></head>
+<body><main>
+  <h1>FlowScrape privacy & threat model</h1>
+  <p class="lead">FlowScrape performs capture locally after you explicitly activate it. Optional AI cleanup is separately user-initiated and clearly identifies what is sent.</p>
+  <section><h2>Local capture</h2><ul>
+    <li>Captured records stay in extension-owned IndexedDB unless you deliberately export them.</li>
+    <li>Settings and lightweight recovery metadata use <code>chrome.storage.local</code>.</li>
+    <li>FlowScrape has no analytics, remote scripts, cookie access, or page-localStorage writes.</li>
+    <li>Exports are initiated by you and written through Chrome's download UI or clipboard.</li>
+  </ul></section>
+  <section><h2>Optional Groq AI cleanup</h2><ul>
+    <li>AI cleanup is off by default and runs only when you choose <strong>Clean with AI</strong>.</li>
+    <li>Groq receives field names, types, coverage/uniqueness statistics, up to three shortened sample values per visible field, and your optional cleanup instruction. FlowScrape does not place the complete record dataset or API key inside the AI prompt.</li>
+    <li>Your Groq API key is sent to <code>api.groq.com</code> only as an authorization header. Session-only storage is the default. Persistent extension-local storage is an explicit option; browser extension storage is not a hardware-backed secret vault.</li>
+    <li>Original IndexedDB records remain unchanged. The AI-cleaned result is a separate preview, and exports clearly identify whether the original or cleaned view is selected.</li>
+    <li>Data sent to Groq is handled under Groq's terms and privacy practices. Do not use AI cleanup for data you are not authorized to send to that provider.</li>
+  </ul></section>
+  <section><h2>Permission boundaries</h2><p>Required permissions are limited to <code>activeTab</code>, <code>scripting</code>, <code>storage</code>, <code>sidePanel</code>, and <code>downloads</code>. Access to <code>https://api.groq.com/*</code> is optional and requested only when you configure or use Groq. No broad installation-time website permission is required.</p></section>
+  <section><h2>Threat model</h2><table><thead><tr><th>Risk</th><th>Control</th></tr></thead><tbody>
+    <tr><td>Hostile page content</td><td>Typed messages, React escaping, isolated content-script world, no execution of extracted HTML.</td></tr>
+    <tr><td>Prompt injection in scraped text</td><td>Samples are serialized as inert data, the API key is never in prompts, output is constrained to a strict JSON schema, and all referenced source IDs and regex patterns are locally validated.</td></tr>
+    <tr><td>Malformed or unavailable AI response</td><td>Bounded timeout and retry, atomic validation, cancellation, actionable errors, and immutable original records.</td></tr>
+    <tr><td>API key disclosure</td><td>No bundled key, no key in logs/prompts/exports/session metadata, masked entry, session-only default, explicit deletion.</td></tr>
+    <tr><td>CSV formula injection</td><td>Cells beginning with <code>=</code>, <code>+</code>, <code>-</code>, or <code>@</code> are prefixed before export.</td></tr>
+    <tr><td>Accidental sensitive collection</td><td>Explicit activation, field preview, sensitive-site warning, domain blocklist, and no form-value reading.</td></tr>
+    <tr><td>Extension compromise through remote code</td><td>All executable code is bundled; manifest CSP permits no remote scripts or <code>eval</code>. Groq returns data only.</td></tr>
+    <tr><td>Browser security boundary</td><td>Cross-origin frames, closed shadow roots, protected pages, PDFs, and canvas-only content are reported rather than bypassed.</td></tr>
+  </tbody></table></section>
+  <section><h2>Your responsibility</h2><p>Only collect and transmit information you are authorized to access. FlowScrape does not bypass CAPTCHAs, authentication, paywalls, rate limits, access controls, or anti-bot systems.</p></section>
+</main></body></html>

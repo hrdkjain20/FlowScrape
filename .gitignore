@@ -1,0 +1,23 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.log
+*.tsbuildinfo
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+secrets/
+
+# Browser and editor state
+.playwright/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
